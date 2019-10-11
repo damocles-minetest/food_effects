@@ -40,11 +40,13 @@ food_effects.register = function(foodname, monoid, value, seconds, enable_hud)
 
 			if time < 0 then
 				time = nil
-				hb.change_hudbar(player, foodname, 0)
+				if enable_hud then
+					hb.change_hudbar(player, foodname, 0)
+				end
 				if player then
 					monoid:del_change(player, foodname)
 				end
-			else
+			elseif enable_hud then
 				hb.change_hudbar(player, foodname, time)
 			end
 
