@@ -15,5 +15,6 @@ read_globals = {
 
 	-- deps
 	"default",
-	"player_monoids"
+	"player_monoids",
+	"hb"
 }
