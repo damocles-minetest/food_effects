@@ -1,53 +1,81 @@
 
-local has_hudbars = minetest.get_modpath("hudbars")
+local HUD_POSITION = {x = 0.05, y = 0.3}
+local HUD_ALIGNMENT = {x = 1, y = 0}
+local HUD_Y_OFFSET = 0
 
 food_effects.register = function(foodname, monoid, value, seconds, enable_hud)
 
 	-- playername -> timeout
 	local data = {}
-	enable_hud = enable_hud and has_hudbars
+	-- playername -> {}
+	local hud = {}
+	local hud_image = ""
 
 	if enable_hud then
 
 		local itemdef = minetest.registered_items[foodname]
-		local image = itemdef.inventory_image
-
-	        hb.register_hudbar(foodname, 0xFFFFFF, "XP", {
-			icon = image,
-			bgicon = "hudbars_bar_background.png",
-			bar = "hudbars_bar_breath.png"
-		}, 0, 10, false)
-
+		hud_image = itemdef.inventory_image
 
 		minetest.register_on_joinplayer(function(player)
-			hb.init_hudbar(player, foodname, 0, 10, true)
+			local hud_data = {}
+			hud[player:get_player_name()] = hud_data
+
+			hud_data.time = player:hud_add({
+		    hud_elem_type = "text",
+		    position = HUD_POSITION,
+		    offset = {x = 0,   y = 0 + HUD_Y_OFFSET},
+		    text = "",
+		    alignment = HUD_ALIGNMENT,
+		    scale = {x = 100, y = 100},
+		    number = 0x00FF00
+		  })
+
+			hud_data.img = player:hud_add({
+		    hud_elem_type = "image",
+		    position = HUD_POSITION,
+		    offset = {x = -32,   y = -8 + HUD_Y_OFFSET},
+		    text = "",
+		    alignment = HUD_ALIGNMENT,
+		    scale = {x = 2, y = 2},
+		  })
+
+			HUD_Y_OFFSET = HUD_Y_OFFSET + 24
+
+		end)
+
+		minetest.register_on_leaveplayer(function(player)
+			hud[player:get_player_name()] = nil
 		end)
 	end
 
 	local timer = 0
 	minetest.register_globalstep(function(dtime)
 		timer = timer + dtime
-		if timer < 1 then
+		if timer < 0.2 then
 			return
 		end
 		timer = 0
 
 		for playername in pairs(data) do
 			local time = data[playername]
-			time = time - dtime
+			time = time - 0.2
 
 			local player = minetest.get_player_by_name(playername)
 
 			if time < 0 then
 				time = nil
 				if enable_hud then
-					hb.change_hudbar(player, foodname, 0)
+					local hud_data = hud[playername]
+					player:hud_change(hud_data.time, "text", "")
+					player:hud_change(hud_data.img, "text", "")
 				end
 				if player then
 					monoid:del_change(player, foodname)
 				end
 			elseif enable_hud then
-				hb.change_hudbar(player, foodname, time)
+				local hud_data = hud[playername]
+				player:hud_change(hud_data.time, "text", math.floor(time*10)/10 .. " s")
+				player:hud_change(hud_data.img, "text", hud_image)
 			end
 
 			data[playername] = time
@@ -63,6 +91,3 @@ food_effects.register = function(foodname, monoid, value, seconds, enable_hud)
 		end
 	end)
 end
-
-
-
