@@ -3,7 +3,12 @@ local HUD_POSITION = {x = 0.05, y = 0.3}
 local HUD_ALIGNMENT = {x = 1, y = 0}
 local HUD_Y_OFFSET = 0
 
+-- itemname => true
+local items_with_effects = {}
+
 food_effects.register = function(foodname, monoid, value, seconds, enable_hud)
+
+	items_with_effects[foodname] = true
 
 	-- playername -> timeout
 	local data = {}
@@ -71,6 +76,11 @@ food_effects.register = function(foodname, monoid, value, seconds, enable_hud)
 				end
 				if player then
 					monoid:del_change(player, foodname)
+
+					minetest.sound_play("food_effects_out", {
+						to_player = player:get_player_name(),
+						gain = 0.7
+					})
 				end
 			elseif enable_hud then
 				local hud_data = hud[playername]
@@ -91,3 +101,24 @@ food_effects.register = function(foodname, monoid, value, seconds, enable_hud)
 		end
 	end)
 end
+
+minetest.register_on_item_eat(function(_, _, itemstack, player)
+	local name = itemstack:get_name()
+	local has_effect = items_with_effects[name]
+
+	if has_effect then
+		-- effect sound
+		minetest.sound_play("food_effects_spell", {
+			to_player = player:get_player_name(),
+			gain = 0.7
+		})
+
+	else
+		-- eat sound
+		minetest.sound_play("stamina_eat", {
+			to_player = player:get_player_name(),
+			gain = 0.7
+		})
+
+	end
+end)
