@@ -1,8 +1,4 @@
 
-local HUD_POSITION = {x = 0.05, y = 0.3}
-local HUD_ALIGNMENT = {x = 1, y = 0}
-local HUD_Y_OFFSET = 0
-
 -- itemname => true
 local items_with_effects = {}
 
@@ -27,24 +23,24 @@ food_effects.register = function(foodname, monoid, value, seconds, enable_hud)
 
 			hud_data.time = player:hud_add({
 		    hud_elem_type = "text",
-		    position = HUD_POSITION,
-		    offset = {x = 0,   y = 0 + HUD_Y_OFFSET},
+		    position = food_effects.HUD_POSITION,
+		    offset = {x = 0,   y = 0 + food_effects.HUD_Y_OFFSET},
 		    text = "",
-		    alignment = HUD_ALIGNMENT,
+		    alignment = food_effects.HUD_ALIGNMENT,
 		    scale = {x = 100, y = 100},
 		    number = 0x00FF00
 		  })
 
 			hud_data.img = player:hud_add({
 		    hud_elem_type = "image",
-		    position = HUD_POSITION,
-		    offset = {x = -32,   y = -8 + HUD_Y_OFFSET},
+		    position = food_effects.HUD_POSITION,
+		    offset = {x = -32,   y = -8 + food_effects.HUD_Y_OFFSET},
 		    text = "",
-		    alignment = HUD_ALIGNMENT,
+		    alignment = food_effects.HUD_ALIGNMENT,
 		    scale = {x = 2, y = 2},
 		  })
 
-			HUD_Y_OFFSET = HUD_Y_OFFSET + 24
+			food_effects.HUD_Y_OFFSET = food_effects.HUD_Y_OFFSET + 24
 
 		end)
 
