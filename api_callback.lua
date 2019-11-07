@@ -1,5 +1,6 @@
 
-food_effects.register = function(foodname, monoid, value, seconds, enable_hud)
+
+food_effects.register_callback = function(foodname, seconds, enable_hud, callback)
 
 	food_effects.items_with_effects[foodname] = true
 
@@ -49,7 +50,7 @@ food_effects.register = function(foodname, monoid, value, seconds, enable_hud)
 	local timer = 0
 	minetest.register_globalstep(function(dtime)
 		timer = timer + dtime
-		if timer < 0.2 then
+		if timer < 0.8 then
 			return
 		end
 		timer = 0
@@ -68,7 +69,7 @@ food_effects.register = function(foodname, monoid, value, seconds, enable_hud)
 					player:hud_change(hud_data.img, "text", "")
 				end
 				if player then
-					monoid:del_change(player, foodname)
+					callback(player)
 
 					minetest.sound_play("food_effects_out", {
 						to_player = player:get_player_name(),
@@ -89,7 +90,6 @@ food_effects.register = function(foodname, monoid, value, seconds, enable_hud)
 	minetest.register_on_item_eat(function(_, _, itemstack, player)
 		local name = itemstack:get_name()
 		if name == foodname then
-			monoid:add_change(player, value, foodname)
 			data[player:get_player_name()] = seconds
 		end
 	end)
