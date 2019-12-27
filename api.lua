@@ -59,11 +59,12 @@ food_effects.register = function(foodname, monoid, value, seconds, enable_hud)
 			time = time - 0.2
 
 			local player = minetest.get_player_by_name(playername)
+			local hud_data = hud[playername]
 
 			if time < 0 then
+				-- effect wears out
 				time = nil
-				if enable_hud then
-					local hud_data = hud[playername]
+				if enable_hud and hud_data then
 					player:hud_change(hud_data.time, "text", "")
 					player:hud_change(hud_data.img, "text", "")
 				end
@@ -75,8 +76,8 @@ food_effects.register = function(foodname, monoid, value, seconds, enable_hud)
 						gain = 0.7
 					})
 				end
-			elseif enable_hud then
-				local hud_data = hud[playername]
+			elseif enable_hud and hud_data then
+				-- effect update
 				player:hud_change(hud_data.time, "text", math.floor(time*10)/10 .. " s")
 				player:hud_change(hud_data.img, "text", hud_image)
 			end
